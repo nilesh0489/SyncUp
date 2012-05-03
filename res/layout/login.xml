@@ -3,6 +3,7 @@
     android:layout_height="fill_parent"
     android:background="#F2EDED"
     android:onClick="login_handler()"
+
     android:orientation="vertical" >
 
     <TextView
@@ -11,47 +12,74 @@
         android:textColor="#000000" />
     
     <TextView
-        android:layout_width="fill_parent"
+        android:layout_width="175dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="5dp"
         android:layout_height="20dp"
-        android:textColor="#2D22F5"
-		android:text="Username" />
+        android:textColor="#000"
+        android:text="Username" />
+
     <EditText
         android:id="@+id/xparam"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#F57A22" />
-	<TextView
-        android:layout_width="fill_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:textColorHighlight="#9E6117"
+
+        android:textColor="#000" />
+
+	<TextView
+        android:layout_width="175dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="10dp"
         android:layout_height="20dp"
-        android:textColor="#2D22F5"
+        android:textColor="#000"
 		android:text="Password" />
     <EditText
         android:id="@+id/yparam"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:password="true" 
-        android:textColor="#F57A22" />
-    
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:password="true"
+        android:textColor="#000" />
+    
+
+
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="60dp"
         android:textColor="#000000" />
-
+
+
     <Button
         android:id="@+id/button1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="175dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="70dp"
+        android:layout_marginBottom="30dp"
         android:onClick="LoginHandler"
         android:text="Login"
-        android:textColor="#2D22F5" />
-  
+        android:hint="33B5E5"
+        android:background="@drawable/btn_green_matte"
+        android:textColor="#000" />
+  
+
     <Button
         android:id="@+id/button1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="175dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="70dp"
+        android:layout_marginBottom="30dp"
+        android:hint="33B5E5"
+
         android:onClick="SignUp"
         android:text="SignUp"
-        android:textColor="#2D22F5" />
+
+        android:background="@drawable/btn_red_matte"
+        android:textColor="#000" />
 
     <TextView
         android:layout_width="fill_parent"

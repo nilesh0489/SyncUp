@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -27,6 +28,7 @@ import android.view.View;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class PresentationList extends ListActivity {
+    private ProgressDialog pd;
     private ArrayList<ParcelablePresentation> ar;
     private String loginId;
     private String sessionKey;
@@ -55,6 +57,7 @@ public class PresentationList extends ListActivity {
                 Presentation presentation = ar.get(position).getPresentation();
 
                 String url = "http://10.0.2.2:8080/presentation/" + presentation.getId() + '/' + '0';
+                pd = ProgressDialog.show(parent.getContext(), "", "Loading ...", true);
                 DownloadImageTask task = new DownloadImageTask();
                 task.execute(new String[] {url});
 
@@ -104,6 +107,9 @@ public class PresentationList extends ListActivity {
         }
 
         protected void onPostExecute(String result) {
+            if (pd.isShowing()) {
+                pd.dismiss();
+            }
             Toast.makeText(getApplicationContext(), "DONE" ,
                     Toast.LENGTH_SHORT).show();
         }

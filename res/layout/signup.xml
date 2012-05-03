@@ -6,53 +6,79 @@
 
     <TextView
         android:layout_width="fill_parent"
-        android:layout_height="20dp"
+        android:layout_height="wrap_content"
         android:textColor="#000000" />
     
 
     <TextView
         android:layout_width="fill_parent"
-        android:layout_height="20dp"
-        android:textColor="#2D22F5"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:textColor="#000"
 		android:text="Name" />
+
     <EditText
         android:id="@+id/name"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#F57A22" />
+        android:textColor="#000" />
     
     <TextView
+       android:layout_marginLeft="16dp"
+       android:layout_marginRight="16dp"
+       android:layout_marginTop="8dp"
         android:layout_width="fill_parent"
-        android:layout_height="20dp"
-        android:textColor="#2D22F5"
+        android:layout_height="wrap_content"
+        android:textColor="#000"
 		android:text="LoginID" />
     <EditText
         android:id="@+id/login"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#F57A22" />
+        android:textColor="#000" />
     
 	<TextView
         android:layout_width="fill_parent"
-        android:layout_height="20dp"
-        android:textColor="#2D22F5"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_height="wrap_content"
+        android:textColor="#000"
 		android:text="Password" />
 	<EditText
         android:id="@+id/passwd"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#F57A22" />
+        android:textColor="#000" />
 	
 	<TextView
         android:layout_width="fill_parent"
-        android:layout_height="20dp"
-        android:textColor="#2D22F5"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_height="wrap_content"
+        android:textColor="#000"
 		android:text="Email ID" />
     <EditText
         android:id="@+id/email"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#F57A22" />
+        android:textColor="#000" />
 
     <TextView
         android:layout_width="fill_parent"
@@ -61,11 +87,14 @@
 
     <Button
         android:id="@+id/button1"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="SignUp_handler"
         android:text="Register"
-        android:textColor="#2D22F5" />
+        android:textColor="#000" />
 
     <TextView
         android:layout_width="fill_parent"
