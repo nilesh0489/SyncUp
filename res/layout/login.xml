@@ -1,0 +1,62 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#F2EDED"
+    android:onClick="login_handler()"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="20dp"
+        android:textColor="#000000" />
+    
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="20dp"
+        android:textColor="#2D22F5"
+		android:text="Username" />
+    <EditText
+        android:id="@+id/xparam"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#F57A22" />
+	<TextView
+        android:layout_width="fill_parent"
+        android:layout_height="20dp"
+        android:textColor="#2D22F5"
+		android:text="Password" />
+    <EditText
+        android:id="@+id/yparam"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:password="true" 
+        android:textColor="#F57A22" />
+    
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:textColor="#000000" />
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="LoginHandler"
+        android:text="Login"
+        android:textColor="#2D22F5" />
+  
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="SignUp"
+        android:text="SignUp"
+        android:textColor="#2D22F5" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.05"
+        android:textColor="#000000" />
+
+</LinearLayout>
