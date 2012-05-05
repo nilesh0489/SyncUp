@@ -10,12 +10,13 @@ import android.app.Service;
 import android.os.Binder;
 import android.os.IBinder;
 import android.content.Intent;
+import com.syncup.utils.Configuration;
 
 public class MyService extends Service 
 {
 	String jsonString;
     private final IBinder mBinder = new LocalBinder();
-   
+
     public class LocalBinder extends Binder {
         MyService getService() {
             return MyService.this;
@@ -48,7 +49,7 @@ public class MyService extends Service
     	Gson gson = new Gson();
     	jsonString = gson.toJson(login);
     
-    	RestClient rc = new RestClient("http://10.0.2.2:8080/login");
+    	RestClient rc = new RestClient(Configuration.loginUrl);
     	
     	rc.setJSONString(jsonString);
     	System.out.println(jsonString);
@@ -71,21 +72,21 @@ public class MyService extends Service
     	
     }
     
-    public String signupMethod(String name, String login, String password, String email)
+    public boolean signupMethod(String name, String login, String password, String email)
     {
     	System.out.println("Inside service file for signupMethod");
     	 
-    	User u = new User();
+    	User user = new User();
     	
-    	u.setName(name);
-    	u.setLoginId(login);
-    	u.setPassword(password);
-    	u.setEmailId(email);
+    	user.setName(name);
+    	user.setLoginId(login);
+    	user.setPassword(password);
+    	user.setEmailId(email);
     	
     	Gson gson = new Gson();
-    	jsonString = gson.toJson(u);
+    	jsonString = gson.toJson(user);
     
-    	RestClient rc = new RestClient("http://10.0.2.2:8080/signup");
+    	RestClient rc = new RestClient(Configuration.signupUrl);
     	
     	rc.setJSONString(jsonString);
     	System.out.println(jsonString);
@@ -100,10 +101,10 @@ public class MyService extends Service
     	
     	if(rc.getResponseCode() != 200)
     	{
-    		return rc.getErrorMessage();
+    		return false;
     	}
         
-    	return rc.getResponse();
+    	return true;
     }
     
 }

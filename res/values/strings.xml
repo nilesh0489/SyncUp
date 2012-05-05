@@ -3,5 +3,9 @@
 
     <string name="hello">Hello World, MainActivity!</string>
     <string name="app_name">Sync Up!</string>
+    <string name="button1">NEXT</string>
+    <string name="button2">PREVIOUS</string>
+    <string name="Login">ec2-50-17-172-93.compute-1.amazonaws.com:8080/login</string>
+    <string name="Signup">ec2-50-17-172-93.compute-1.amazonaws.com:8080/signup</string>
 
 </resources>

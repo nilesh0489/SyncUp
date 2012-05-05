@@ -1,5 +1,6 @@
 package login.activity;
 
+import android.widget.Toast;
 import login.activity.MyService.LocalBinder;
 import android.app.Activity;
 import android.os.Bundle;
@@ -27,7 +28,6 @@ public class SignUp extends Activity
 		setContentView(R.layout.signup);  
 		 Intent intent=new Intent("login.activity.MyService");  
 	        this.startService(intent);
-
     } 
 	
 	@Override
@@ -95,12 +95,19 @@ public class SignUp extends Activity
 	    			emailId = email.getText().toString();
 	    			
 	    				
-	    			String result  = mService.signupMethod(username, loginId, password, emailId);
-	    			
-	    			System.out.println("In Signup: Result is: "+ result);
-			
-	    			Intent myIntent = new Intent(view.getContext(), Login.class);
-	    			startActivity(myIntent);
+	    			boolean result  = mService.signupMethod(username, loginId, password, emailId);
+
+                if(result == true)
+                {
+                    Intent myIntent = new Intent(view.getContext(), Login.class);
+                    startActivity(myIntent);
+                }
+
+                else
+                {
+                    Toast.makeText(getApplicationContext(), "SignUp Failed", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 			}
 	    }
 	
