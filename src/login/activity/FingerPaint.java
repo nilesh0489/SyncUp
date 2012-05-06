@@ -154,7 +154,8 @@ public class FingerPaint extends GraphicsActivity
         { 
             mBitmap = bp;
             mCanvas = new Canvas(bp);
-            mCanvas.drawBitmap(bp, 0, 0, mPaint);
+            Bitmap newbp = Bitmap.createScaledBitmap(bp, this.getWidth(), this.getHeight(), true);
+            mCanvas.drawBitmap(newbp, 0, 0, mPaint);
             invalidate();
         }
 
