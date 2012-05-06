@@ -45,7 +45,7 @@ public class PresentationList extends ListActivity {
                 Presentation presentation = ar.get(position).getPresentation();
 
                // String url = "http://10.0.2.2:8080/presentation/" + presentation.getId() + '/' + '0';
-                String url = Configuration.presentationUrl + presentation.getId() + '/';
+                String url = Configuration.presentationUrl + presentation.getId() + '/' + '0';
                 String folderName = Environment.getExternalStorageDirectory() + "/SyncUp/" + presentation.getName() + "/";
                 Intent myIntent = new Intent(view.getContext(), FingerPaint.class);
                 myIntent.putExtra("URL", url);

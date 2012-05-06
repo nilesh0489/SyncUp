@@ -1,9 +1,9 @@
-
 package login.activity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.*;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -12,8 +12,11 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -45,8 +48,7 @@ public class FingerPaint extends GraphicsActivity
 
         pd = ProgressDialog.show(this, "", "Loading ...", true);
 
-        DownloadImageTask task = new DownloadImageTask();
-        task.execute(new String[] {url});
+        
         super.onCreate(savedInstanceState);
         LinearLayout Game = new LinearLayout(this);
         Game.setWeightSum((float)1.0);
@@ -79,10 +81,12 @@ public class FingerPaint extends GraphicsActivity
         l1.addView(button);
         l1.addView(button1);
         Game.addView(l1);
-
+        
         //Game.addView(l1);
         setContentView(Game);
-
+        DownloadImageTask task = new DownloadImageTask(folderName);
+        task.execute(new String[] {url});
+        
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
@@ -124,10 +128,23 @@ public class FingerPaint extends GraphicsActivity
         }
 
         public void changeBitmap(Bitmap bp)
-        {
+        { 
             mBitmap = bp;
-            mCanvas = new Canvas(mBitmap);
-            view.onDraw(mCanvas);
+         /*   
+            ImageView imageview = new ImageView(this.getContext());
+
+            imageview.setImageResource(R.drawable.ic_launcher);
+
+            BitmapDrawable drawable = (BitmapDrawable) imageview.getDrawable();
+
+          //  Bitmap bitmap = drawable.getBitmap();
+
+            Bitmap newbitmap = Bitmap.createScaledBitmap(drawable.getBitmap(), this.getWidth(), 650, true);
+            */
+            mCanvas = new Canvas(bp);
+            mCanvas.drawBitmap(bp, 0, 0, mPaint);
+            //view.onDraw(mCanvas);
+            invalidate();
         }
 
         @Override
@@ -265,12 +282,14 @@ public class FingerPaint extends GraphicsActivity
     }
 
     private class DownloadImageTask extends AsyncTask<String, Void, String> {
-        // Set this to the image id from doInBackGround task
-        // and depending on the image set the boolean in an array to True
-        // if the download is complete
+        
        // int image_id;
         String folderName;
         String fileName;
+        
+        public DownloadImageTask(String folderName) {
+        	this.folderName = folderName;
+		}
 
         protected String doInBackground (String ... urls) {
             for (String url : urls) {
@@ -311,12 +330,13 @@ public class FingerPaint extends GraphicsActivity
             if (pd.isShowing()) {
                 pd.dismiss();
             }
-      //      Toast.makeText(getApplicationContext(), "DONE",
-      //              Toast.LENGTH_SHORT).show();
+         //   Toast.makeText(getApplicationContext(), "DONE",
+         //           Toast.LENGTH_SHORT).show();
             String path = folderName + fileName;
+            System.out.println("Path is: "+path);
             Bitmap bmp;
-            bmp = BitmapFactory.decodeFile(path);
-
+            bmp = BitmapFactory.decodeFile(path).copy(Bitmap.Config.ARGB_8888, true);
+            System.out.println("Bitmap is: "+bmp);
             view.changeBitmap(bmp);
 
         }

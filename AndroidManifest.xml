@@ -21,6 +21,7 @@
         </activity>
         <activity android:name=".SignUp"></activity>
         <activity android:name=".PresentationList"></activity>
+        <activity android:name =".FingerPaint"></activity>
         <service android:enabled="true" android:name=".MyService" >
             <intent-filter><action android:name="login.activity.MyService"></action>
    </intent-filter>
