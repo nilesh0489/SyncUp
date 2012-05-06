@@ -72,7 +72,7 @@ public class MyService extends Service
     	
     }
     
-    public boolean signupMethod(String name, String login, String password, String email)
+    public String signupMethod(String name, String login, String password, String email)
     {
     	System.out.println("Inside service file for signupMethod");
     	 
@@ -98,13 +98,18 @@ public class MyService extends Service
     	catch (Exception e) {
     		e.printStackTrace();
 		}
-    	
-    	if(rc.getResponseCode() != 200)
+    
+    	if(rc.getResponseCode() == 400)
     	{
-    		return false;
+    		return "Please enter all the details";
     	}
-        
-    	return true;
+    	
+    	if(rc.getResponseCode() == 409)
+    	{
+    		return "LoginId already exists. Please choose some other name";
+    	}
+    	
+    	return "OK";
     }
     
 }

@@ -95,21 +95,21 @@ public class SignUp extends Activity
 	    			emailId = email.getText().toString();
 	    			
 	    				
-	    			boolean result  = mService.signupMethod(username, loginId, password, emailId);
+	    			String result  = mService.signupMethod(username, loginId, password, emailId);
 
-                if(result == true)
-                {
+            if(result.equals("OK"))
+            {
                     Intent myIntent = new Intent(view.getContext(), Login.class);
                     startActivity(myIntent);
-                }
+            }
 
-                else
-                {
-                    Toast.makeText(getApplicationContext(), "SignUp Failed", Toast.LENGTH_SHORT).show();
+            else
+            {
+                    Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
                     return;
-                }
-			}
-	    }
+            }
+		}
+	}
 	
 }
     

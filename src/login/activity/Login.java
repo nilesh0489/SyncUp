@@ -71,10 +71,7 @@ public class Login extends Activity
     			for (Presentation point : response.getPresentationsList()) {
     			   pointsExtra.add(new ParcelablePresentation(point));
     			}
-    			
-    			//Bundle b = new Bundle();
-    	       // b.putParcelable("com.example.trafficlight", pointsExtra);
-    	        //b.putParcelableArrayList("list", pointsExtra);
+
     	        Intent i = new Intent(this, PresentationList.class);
     	        i.putExtra("List", pointsExtra);
     	        i.putExtra("loginId", response.getLoginId());
