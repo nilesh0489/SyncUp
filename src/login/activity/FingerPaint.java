@@ -29,22 +29,31 @@ import java.io.InputStream;
 
 public class FingerPaint extends GraphicsActivity
         implements ColorPickerDialog.OnColorChangedListener {
+
     private ProgressDialog pd;
     private String loginId;
     private String sessionKey;
     private String url;
-    private int size;
+     private int currentSlide;
+    private int totalSlides;
+    private boolean[] slidesBitMap;
     private MyView view;
     private String folderName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Receive intent parameters from Presentation Activity
-        //and call the download task here
+
+        currentSlide = 0;
+        slidesBitMap = new boolean[totalSlides];
+
+
+        // Get the values passed in the intent
         url = getIntent().getStringExtra("URL");
         loginId = getIntent().getStringExtra("login-id");
         sessionKey = getIntent().getStringExtra("session-key");
-        size = getIntent().getIntExtra("size", 30);
+        totalSlides = getIntent().getIntExtra("size", 30);
         folderName = getIntent().getStringExtra("folderName");
+
 
         pd = ProgressDialog.show(this, "", "Loading ...", true);
 
@@ -53,19 +62,12 @@ public class FingerPaint extends GraphicsActivity
         LinearLayout Game = new LinearLayout(this);
         Game.setWeightSum((float)1.0);
         LinearLayout l1 = new LinearLayout(this);
-        //LinearLayout l2 = new LinearLayout(this);
+
         l1.setOrientation(LinearLayout.VERTICAL);
-        RelativeLayout.LayoutParams lay = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        RelativeLayout.LayoutParams lay1 = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, 200);
 
-        lay.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-        lay1.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        //l1.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
-        //l1.addView(new MyView(this));
         view = new MyView(this);
-
-
         view.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, (float)0.9));
+
         Button button = new Button(this);
         Button button1 = new Button(this);
 
@@ -74,19 +76,17 @@ public class FingerPaint extends GraphicsActivity
 
         button1.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, (float)0.05));
         button1.setText(R.string.button1);
-        //button.setWidth();
-        //l1.addView(view, lay);
-        //l2.addView(button, lay1);
+
         l1.addView(view);
         l1.addView(button);
         l1.addView(button1);
         Game.addView(l1);
         
-        //Game.addView(l1);
+
         setContentView(Game);
-        DownloadImageTask task = new DownloadImageTask(folderName);
-        task.execute(new String[] {url});
-        
+
+        slideDownloader(currentSlide);
+
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
@@ -281,22 +281,35 @@ public class FingerPaint extends GraphicsActivity
         return super.onOptionsItemSelected(item);
     }
 
+    private void slideDownloader(int slide) {
+        int n = slide + 5;
+        for (int j = slide ; j < totalSlides && j < n; j++) {
+            if (!slidesBitMap[j]) {
+                DownloadImageTask task = new DownloadImageTask(folderName, j);
+                task.execute(new String[] {url});
+            }
+        }
+
+    }
+
     private class DownloadImageTask extends AsyncTask<String, Void, String> {
         
        // int image_id;
         String folderName;
         String fileName;
+        int slideId;
         
-        public DownloadImageTask(String folderName) {
+        public DownloadImageTask(String folderName, int slideId) {
         	this.folderName = folderName;
+            this.slideId = slideId;
 		}
 
         protected String doInBackground (String ... urls) {
             for (String url : urls) {
-                    fileName = "temp" + ".jpg";
+                    fileName = slideId + ".jpg";
                 File output = new File(folderName, fileName);
                 if (output.exists()) {
-                    output.delete();
+                    return null;
                 }
 
                 InputStream stream = null;
@@ -330,14 +343,15 @@ public class FingerPaint extends GraphicsActivity
             if (pd.isShowing()) {
                 pd.dismiss();
             }
-         //   Toast.makeText(getApplicationContext(), "DONE",
-         //           Toast.LENGTH_SHORT).show();
-            String path = folderName + fileName;
-            System.out.println("Path is: "+path);
-            Bitmap bmp;
-            bmp = BitmapFactory.decodeFile(path).copy(Bitmap.Config.ARGB_8888, true);
-            System.out.println("Bitmap is: "+bmp);
-            view.changeBitmap(bmp);
+            slidesBitMap[slideId] = true;
+            if (currentSlide == slideId) {
+                String path = folderName + fileName;
+                System.out.println("Path is: "+path);
+                Bitmap bmp;
+                bmp = BitmapFactory.decodeFile(path).copy(Bitmap.Config.ARGB_8888, true);
+                System.out.println("Bitmap is: "+bmp);
+                view.changeBitmap(bmp);
+           }
 
         }
 
