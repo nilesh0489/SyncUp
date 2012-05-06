@@ -3,7 +3,6 @@ package login.activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.*;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -11,17 +10,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,20 +39,17 @@ public class FingerPaint extends GraphicsActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        currentSlide = 0;
-        slidesBitMap = new boolean[totalSlides];
-
-
-        // Get the values passed in the intent
+        
         url = getIntent().getStringExtra("URL");
         loginId = getIntent().getStringExtra("login-id");
         sessionKey = getIntent().getStringExtra("session-key");
         totalSlides = getIntent().getIntExtra("size", 30);
         folderName = getIntent().getStringExtra("folderName");
-
+        
+        currentSlide = 0;
+        slidesBitMap = new boolean[totalSlides];
 
         pd = ProgressDialog.show(this, "", "Loading ...", true);
-
         
         super.onCreate(savedInstanceState);
         LinearLayout Game = new LinearLayout(this);
@@ -100,6 +93,35 @@ public class FingerPaint extends GraphicsActivity
                 0.4f, 6, 3.5f);
 
         mBlur = new BlurMaskFilter(8, BlurMaskFilter.Blur.NORMAL);
+        
+        button.setOnClickListener(new OnClickListener() {
+			
+			public void onClick(View v) {
+				if (currentSlide == 0) {
+					String error = "Reached Start of Presentation";
+					Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
+				}
+				else  {
+					currentSlide = currentSlide - 1;
+					slideDownloader(currentSlide);
+				}
+			}
+		});
+        
+        button1.setOnClickListener(new OnClickListener() {
+			
+			public void onClick(View v) {
+				if (currentSlide == totalSlides) {
+					String error = "Reached End of Presentation";
+					Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
+				}
+				else  {
+					currentSlide = currentSlide + 1;
+					slideDownloader(currentSlide);
+				}
+			}
+		});
+        
     }
 
     private Paint       mPaint;
@@ -111,9 +133,6 @@ public class FingerPaint extends GraphicsActivity
     }
 
     public class MyView extends View {
-
-      //  private static final float MINP = 0.25f;
-      //  private static final float MAXP = 0.75f;
 
         private Bitmap  mBitmap;
         private Canvas  mCanvas;
@@ -130,20 +149,8 @@ public class FingerPaint extends GraphicsActivity
         public void changeBitmap(Bitmap bp)
         { 
             mBitmap = bp;
-         /*   
-            ImageView imageview = new ImageView(this.getContext());
-
-            imageview.setImageResource(R.drawable.ic_launcher);
-
-            BitmapDrawable drawable = (BitmapDrawable) imageview.getDrawable();
-
-          //  Bitmap bitmap = drawable.getBitmap();
-
-            Bitmap newbitmap = Bitmap.createScaledBitmap(drawable.getBitmap(), this.getWidth(), 650, true);
-            */
             mCanvas = new Canvas(bp);
             mCanvas.drawBitmap(bp, 0, 0, mPaint);
-            //view.onDraw(mCanvas);
             invalidate();
         }
 
@@ -228,14 +235,6 @@ public class FingerPaint extends GraphicsActivity
         menu.add(0, ERASE_MENU_ID, 0, "Erase").setShortcut('5', 'z');
         menu.add(0, SRCATOP_MENU_ID, 0, "SrcATop").setShortcut('5', 'z');
 
-        /****   Is this the mechanism to extend with filter effects?
-         Intent intent = new Intent(null, getIntent().getData());
-         intent.addCategory(Intent.CATEGORY_ALTERNATIVE);
-         menu.addIntentOptions(
-         Menu.ALTERNATIVE, 0,
-         new ComponentName(this, NotesList.class),
-         null, intent, 0, null);
-         *****/
         return true;
     }
 
@@ -288,13 +287,21 @@ public class FingerPaint extends GraphicsActivity
                 DownloadImageTask task = new DownloadImageTask(folderName, j);
                 task.execute(new String[] {url});
             }
+            else {
+            	String fileName = slide + ".jpg";
+            	String path = folderName + fileName;
+                System.out.println("Path is: "+path);
+                Bitmap bmp;
+                bmp = BitmapFactory.decodeFile(path).copy(Bitmap.Config.ARGB_8888, true);
+                System.out.println("Bitmap is: "+bmp);
+                view.changeBitmap(bmp);
+            }
         }
 
     }
 
     private class DownloadImageTask extends AsyncTask<String, Void, String> {
         
-       // int image_id;
         String folderName;
         String fileName;
         int slideId;
@@ -306,7 +313,8 @@ public class FingerPaint extends GraphicsActivity
 
         protected String doInBackground (String ... urls) {
             for (String url : urls) {
-                    fileName = slideId + ".jpg";
+            	url = url + slideId;	
+                fileName = slideId + ".jpg";
                 File output = new File(folderName, fileName);
                 if (output.exists()) {
                     return null;
@@ -333,7 +341,6 @@ public class FingerPaint extends GraphicsActivity
                     buf.close();
                 }
                 catch (Exception e) {
-
                 }
             }
             return null;
