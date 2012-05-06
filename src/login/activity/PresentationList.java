@@ -1,5 +1,6 @@
 package login.activity;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import android.content.Intent;
@@ -46,6 +47,9 @@ public class PresentationList extends ListActivity {
 
                 String url = Configuration.presentationUrl + presentation.getId() + "/";
                 String folderName = Environment.getExternalStorageDirectory() + "/SyncUp/" + presentation.getName() + "/";
+                
+                File file = new File(folderName);
+                file.mkdirs();
                 Intent myIntent = new Intent(view.getContext(), FingerPaint.class);
                 myIntent.putExtra("URL", url);
                 myIntent.putExtra("login-id", loginId);

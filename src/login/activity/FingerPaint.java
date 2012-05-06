@@ -32,7 +32,7 @@ public class FingerPaint extends GraphicsActivity
     private String url;
      private int currentSlide;
     private int totalSlides;
-    private boolean[] slidesBitMap;
+    private int[] slidesBitMap;
     private MyView view;
     private String folderName;
 
@@ -47,8 +47,12 @@ public class FingerPaint extends GraphicsActivity
         folderName = getIntent().getStringExtra("folderName");
         
         currentSlide = 0;
-        slidesBitMap = new boolean[totalSlides];
-
+        slidesBitMap = new int[totalSlides];
+        
+        for (int j = 0; j < totalSlides; j++) {
+        	slidesBitMap[j] = -1;
+         }
+        
         pd = ProgressDialog.show(this, "", "Loading ...", true);
         
         super.onCreate(savedInstanceState);
@@ -283,11 +287,14 @@ public class FingerPaint extends GraphicsActivity
     private void slideDownloader(int slide) {
         int n = slide + 5;
         for (int j = slide ; j < totalSlides && j < n; j++) {
-            if (!slidesBitMap[j]) {
+            if (slidesBitMap[j] == -1) {
                 DownloadImageTask task = new DownloadImageTask(folderName, j);
                 task.execute(new String[] {url});
             }
-            else {
+            else if (slidesBitMap[j] == 0 && currentSlide == j) {
+            	pd = ProgressDialog.show(this, "", "Loading ...", true);
+            }
+            else if (currentSlide == j){
             	String fileName = slide + ".jpg";
             	String path = folderName + fileName;
                 System.out.println("Path is: "+path);
@@ -311,6 +318,11 @@ public class FingerPaint extends GraphicsActivity
             this.slideId = slideId;
 		}
 
+        @Override
+        protected void onPreExecute() {
+        	slidesBitMap[slideId] = 0;
+        }
+        
         protected String doInBackground (String ... urls) {
             for (String url : urls) {
             	url = url + slideId;	
@@ -347,11 +359,12 @@ public class FingerPaint extends GraphicsActivity
         }
 
         protected void onPostExecute(String result) {
-            if (pd.isShowing()) {
-                pd.dismiss();
-            }
-            slidesBitMap[slideId] = true;
+           
+            slidesBitMap[slideId] = 1;
             if (currentSlide == slideId) {
+            	 if (pd.isShowing()) {
+                     pd.dismiss();
+                 }
                 String path = folderName + fileName;
                 System.out.println("Path is: "+path);
                 Bitmap bmp;
