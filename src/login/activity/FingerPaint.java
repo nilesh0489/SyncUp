@@ -62,7 +62,7 @@ public class FingerPaint extends GraphicsActivity
 
         l1.setOrientation(LinearLayout.VERTICAL);
 
-        view = new MyView(this);
+        view = new MyView(this, getWindowManager().getDefaultDisplay().getWidth(), getWindowManager().getDefaultDisplay().getHeight());
         view.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, (float)0.9));
 
         Button button = new Button(this);
@@ -142,19 +142,24 @@ public class FingerPaint extends GraphicsActivity
         private Canvas  mCanvas;
         private Path    mPath;
         private Paint   mBitmapPaint;
+        private int height;
+        private int width;
 
-        public MyView(Context c) {
+        public MyView(Context c, int width, int height) {
             super(c);
 
             mPath = new Path();
             mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+            this.width = width;
+            // TODO don't hardcode this values
+            this.height = height -(int)(((double)height)*0.1);
         }
 
         public void changeBitmap(Bitmap bp)
         { 
             mBitmap = bp;
             mCanvas = new Canvas(bp);
-            Bitmap newbp = Bitmap.createScaledBitmap(bp, this.getWidth(), this.getHeight(), true);
+            Bitmap newbp = Bitmap.createScaledBitmap(bp, width, height, true);
             mCanvas.drawBitmap(newbp, 0, 0, mPaint);
             invalidate();
         }
