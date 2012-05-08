@@ -55,8 +55,7 @@ public class PresentationList extends ListActivity {
                 myIntent.putExtra("login-id", loginId);
                 myIntent.putExtra("session-key", sessionKey);
                 myIntent.putExtra("folderName", folderName);
-                int size = 30;
-                myIntent.putExtra("size", size);
+                myIntent.putExtra("size", presentation.getNoSlides());
                 startActivity(myIntent);
             }
         });
