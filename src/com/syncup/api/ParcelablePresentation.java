@@ -36,6 +36,7 @@ public class ParcelablePresentation implements Parcelable {
     	presentation.setId(in.readLong()); 
         presentation.setLoginId(in.readString());
         presentation.setName(in.readString());
+        presentation.setNoSlides(in.readLong());
     }
 
 	public void writeToParcel(Parcel dest, int flags) 
@@ -43,6 +44,7 @@ public class ParcelablePresentation implements Parcelable {
 		dest.writeLong(presentation.getId());
 		dest.writeString(presentation.getLoginId());
 		dest.writeString(presentation.getName());
+        dest.writeLong(presentation.getNoSlides());
 	}
 	
 	public String toString() {

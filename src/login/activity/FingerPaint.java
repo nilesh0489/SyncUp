@@ -43,7 +43,7 @@ public class FingerPaint extends GraphicsActivity
         url = getIntent().getStringExtra("URL");
         loginId = getIntent().getStringExtra("login-id");
         sessionKey = getIntent().getStringExtra("session-key");
-        totalSlides = getIntent().getIntExtra("size", 30);
+        totalSlides = (int)getIntent().getLongExtra("size", 30);
         folderName = getIntent().getStringExtra("folderName");
         
         currentSlide = 0;
@@ -152,7 +152,7 @@ public class FingerPaint extends GraphicsActivity
             mBitmapPaint = new Paint(Paint.DITHER_FLAG);
             this.width = width;
             // TODO don't hardcode this values
-            this.height = height -(int)(((double)height)*0.1);
+            this.height = height -200;
         }
 
         public void changeBitmap(Bitmap bp)
