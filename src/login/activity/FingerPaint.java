@@ -40,8 +40,8 @@ import login.activity.MyService.LocalBinder;
 
 public class FingerPaint extends GraphicsActivity
         implements ColorPickerDialog.OnColorChangedListener {
-	
-	MyService mService;
+
+    MyService mService;
     boolean mBound = false;
     private ProgressDialog pd;
     private String loginId;
@@ -58,10 +58,10 @@ public class FingerPaint extends GraphicsActivity
     private int pId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-    	
-    	Intent intent=new Intent("login.activity.MyService");  
+
+        Intent intent=new Intent("login.activity.MyService");
         this.startService(intent);
-        
+
         url = getIntent().getStringExtra("URL");
         loginId = getIntent().getStringExtra("login-id");
         sessionKey = getIntent().getStringExtra("session-key");
@@ -70,15 +70,15 @@ public class FingerPaint extends GraphicsActivity
         pId = getIntent().getIntExtra("Id", 1);
         currentSlide = 0;
         slidesBitMap = new int[totalSlides];
-        
-      
-        
+
+
+
         for (int j = 0; j < totalSlides; j++) {
-        	slidesBitMap[j] = -1;
-         }
-        
+            slidesBitMap[j] = -1;
+        }
+
         pd = ProgressDialog.show(this, "", "Loading ...", true);
-        
+
         super.onCreate(savedInstanceState);
         LinearLayout Game = new LinearLayout(this);
         Game.setWeightSum((float)1.0);
@@ -89,8 +89,8 @@ public class FingerPaint extends GraphicsActivity
         view = new MyView(this, getWindowManager().getDefaultDisplay().getWidth(), getWindowManager().getDefaultDisplay().getHeight());
         view.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, (float)0.9));
 
-       button = new Button(this);
-       button1 = new Button(this);
+        button = new Button(this);
+        button1 = new Button(this);
 
         button.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, (float) 0.05));
         button.setText(R.string.button2);
@@ -102,7 +102,7 @@ public class FingerPaint extends GraphicsActivity
         l1.addView(button);
         l1.addView(button1);
         Game.addView(l1);
-        
+
 
         setContentView(Game);
 
@@ -121,46 +121,46 @@ public class FingerPaint extends GraphicsActivity
                 0.4f, 6, 3.5f);
 
         mBlur = new BlurMaskFilter(8, BlurMaskFilter.Blur.NORMAL);
-        
+
         button.setOnClickListener(new OnClickListener() {
-			
-			public void onClick(View v) {
-				if (currentSlide == 0) {
-					String error = "Reached Start of Presentation";
-					Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
-				}
-				else  {
-					currentSlide = currentSlide - 1;
-					slideDownloader(currentSlide);
-				}
-			}
-		});
-        
+
+            public void onClick(View v) {
+                if (currentSlide == 0) {
+                    String error = "Reached Start of Presentation";
+                    Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
+                }
+                else  {
+                    currentSlide = currentSlide - 1;
+                    slideDownloader(currentSlide);
+                }
+            }
+        });
+
         button1.setOnClickListener(new OnClickListener() {
-			
-			public void onClick(View v) {
-				if (currentSlide == totalSlides) {
-					String error = "Reached End of Presentation";
-					Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
-				}
-				else  {
-					currentSlide = currentSlide + 1;
-					slideDownloader(currentSlide);
-				}
-			}
-		});
-        
+
+            public void onClick(View v) {
+                if (currentSlide == totalSlides) {
+                    String error = "Reached End of Presentation";
+                    Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
+                }
+                else  {
+                    currentSlide = currentSlide + 1;
+                    slideDownloader(currentSlide);
+                }
+            }
+        });
+
         syncTimer = new Timer();
         syncTimer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				TimerMethod();
-			}
+            @Override
+            public void run() {
+                TimerMethod();
+            }
 
-		}, 0, 5000);
-        
+        }, 0, 5000);
+
     }
-    
+
     protected void onStart() {
         super.onStart();
         // Bind to LocalService
@@ -177,11 +177,11 @@ public class FingerPaint extends GraphicsActivity
             mBound = false;
         }
     }
-    
-    private ServiceConnection mConnection = new ServiceConnection() 
-	{
-		public void onServiceConnected(ComponentName className, IBinder service) 
-		{
+
+    private ServiceConnection mConnection = new ServiceConnection()
+    {
+        public void onServiceConnected(ComponentName className, IBinder service)
+        {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             LocalBinder binder = (LocalBinder) service;
             mService = binder.getService();
@@ -191,7 +191,7 @@ public class FingerPaint extends GraphicsActivity
         public void onServiceDisconnected(ComponentName arg0) {
             mBound = false;
         }
-	};
+    };
 
     private Paint       mPaint;
     private MaskFilter  mEmboss;
@@ -202,39 +202,39 @@ public class FingerPaint extends GraphicsActivity
     }
 
     public void displayToast() {
-    	Toast.makeText(getApplicationContext(), "Working", Toast.LENGTH_SHORT);
-		
+        Toast.makeText(getApplicationContext(), "Working", Toast.LENGTH_SHORT);
+
     }
-    
+
     public void changeButtonText() {
-    	button.setText("Hello World");
+        button.setText("Hello World");
     }
-    
+
     private void TimerMethod()
-	{
-		//This method is called directly by the timer
-		//and runs in the same thread as the timer.
+    {
+        //This method is called directly by the timer
+        //and runs in the same thread as the timer.
 
-		//We call the method that will work with the UI
-		//through the runOnUiThread method.
-		this.runOnUiThread(Timer_Tick);
-	}
+        //We call the method that will work with the UI
+        //through the runOnUiThread method.
+        this.runOnUiThread(Timer_Tick);
+    }
 
-	private Runnable Timer_Tick = new Runnable() {
-		public void run() {
-			
-			List<PathPoint> pList;
-			SyncResponse sr = mService.syncReceiveMethod(pId, currentSlide);
-			pList = sr.getPathPointList();
-			System.out.println("PList is : " + pList);
-			if (pList != null) {
-				for (PathPoint pathPoint : pList) {
-					view.drawSyncPath(pathPoint);
-				}
-			}
-		}
-	};
-	
+    private Runnable Timer_Tick = new Runnable() {
+        public void run() {
+
+            List<PathPoint> pList;
+            SyncResponse sr = mService.syncReceiveMethod(pId, currentSlide);
+            pList = sr.getPathPointList();
+            System.out.println("PList is : " + pList);
+            if (pList != null) {
+                for (PathPoint pathPoint : pList) {
+                    view.drawSyncPath(pathPoint);
+                }
+            }
+        }
+    };
+
     /**
      * @author Nilesh
      *
@@ -263,88 +263,54 @@ public class FingerPaint extends GraphicsActivity
         }
 
         public void changeBitmap(Bitmap bp)
-        { 
+        {
             //mBitmap = bp;
             mCanvas = new Canvas(bp);
             Bitmap newbp = Bitmap.createScaledBitmap(bp, width, height, true);
             mBitmap = newbp;
             mCanvas.drawBitmap(newbp, 0, 0, mBitmapPaint);
             invalidate();
-            
+
         }
 
         class Pt{
 
-      		float x, y;
+            float x, y;
 
-      		
 
-      		Pt(float _x, float _y){
 
-      			x = _x;
+            Pt(float _x, float _y){
 
-      			y = _y;
+                x = _x;
 
-      		}
+                y = _y;
 
-      	}
-        public void drawSyncPath(PathPoint p){
-//        	SerializablePath path = new SerializablePath();
-//        	path.addPathPointList(p.getPathPoints());
-//        	for (float[] point : p.getPathPoints()) {
-//        		path.quadTo(point[0], point[1], point[2], point[3]);
-//        		System.out.println(point[0] + " " + point[1] + " " + point[2] + " " + point[3]);
-//        	}
-//        	//path.loadPathPointsAsQuadTo();
-//        	Gson gson = new Gson();
-//        	System.out.println(gson.toJson(path.getPathPoints()));
-//        	mCanvas.drawPath(path, mPaint);
-        	
-        	Pt[] myPath = { new Pt(100, 100),
+            }
 
-  					new Pt(200, 200),
-
-  					new Pt(200, 500),
-
-  					new Pt(400, 500),
-
-  					new Pt(400, 200)
-
-  					};
-        	Paint paint = new Paint();
-
-			paint.setColor(Color.GREEN);
-
-			paint.setStrokeWidth(3);
-
-			paint.setStyle(Paint.Style.STROKE);
-
-			Path path = new Path();
-
-			
-
-			path.moveTo(myPath[0].x, myPath[0].y);
-
-			for (int i = 1; i < myPath.length; i++){
-
-				path.lineTo(myPath[i].x, myPath[i].y);
-
-			}
-			System.out.println("Here in draw Path function");
-			
-			mCanvas.drawPath(path, paint);
-        	
         }
-        
+        public void drawSyncPath(PathPoint p){
+        	SerializablePath path = new SerializablePath();
+        	path.addPathPointList(p.getPathPoints());
+        	path.loadPathPointsAsQuadTo();
+        	Gson gson = new Gson();
+        	System.out.println(gson.toJson(path.getPathPoints()));
+            //mCanvas = new Canvas(mBitmap);
+            //mCanvas.setBitmap(mBitmap);
+        	mCanvas.drawPath(path, mPaint);
+            invalidate();
+
+
+        }
+
         @Override
         protected void onSizeChanged(int w, int h, int oldw, int oldh) {
             super.onSizeChanged(w, h, oldw, oldh);
             System.out.println("In on size changed function");
-            
+
             if(mBitmap == null)
             {
-            	mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-            }            
+                mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            }
             mCanvas = new Canvas(mBitmap);
         }
 
@@ -384,6 +350,11 @@ public class FingerPaint extends GraphicsActivity
             PathPoint pathPoint = new PathPoint();
             pathPoint.setPathPoints(mPath.getPathPoints());
             mService.syncMethod(pathPoint, pId, currentSlide);
+
+
+
+            mCanvas.setBitmap(mBitmap);
+
             mPath.reset();
         }
 
@@ -479,40 +450,40 @@ public class FingerPaint extends GraphicsActivity
                 task.execute(new String[] {url});
             }
             else if (slidesBitMap[j] == 0 && currentSlide == j) {
-            	pd = ProgressDialog.show(this, "", "Loading ...", true);
+                pd = ProgressDialog.show(this, "", "Loading ...", true);
             }
             else if (currentSlide == j){
-            	String fileName = slide + ".jpg";
-            	String path = folderName + fileName;
+                String fileName = slide + ".jpg";
+                String path = folderName + fileName;
                 System.out.println("Path is: "+path);
                 Bitmap bmp;
-                bmp = BitmapFactory.decodeFile(path).copy(Bitmap.Config.ARGB_8888, true);                
+                bmp = BitmapFactory.decodeFile(path).copy(Bitmap.Config.ARGB_8888, true);
                 view.changeBitmap(bmp);
             }
         }
-        
+
     }
-    
-  
+
+
     private class DownloadImageTask extends AsyncTask<String, Void, String> {
-        
+
         String folderName;
         String fileName;
         int slideId;
-        
+
         public DownloadImageTask(String folderName, int slideId) {
-        	this.folderName = folderName;
+            this.folderName = folderName;
             this.slideId = slideId;
-		}
+        }
 
         @Override
         protected void onPreExecute() {
-        	slidesBitMap[slideId] = 0;
+            slidesBitMap[slideId] = 0;
         }
-        
+
         protected String doInBackground (String ... urls) {
             for (String url : urls) {
-            	url = url + slideId;	
+                url = url + slideId;
                 fileName = slideId + ".jpg";
                 File output = new File(folderName, fileName);
                 if (output.exists()) {
@@ -546,17 +517,17 @@ public class FingerPaint extends GraphicsActivity
         }
 
         protected void onPostExecute(String result) {
-           System.out.println("Inside Post Execute function");
+            System.out.println("Inside Post Execute function");
             slidesBitMap[slideId] = 1;
             if (currentSlide == slideId) {
-            	 if (pd.isShowing()) {
-                     pd.dismiss();
-                 }
-                String path = folderName + fileName;                
+                if (pd.isShowing()) {
+                    pd.dismiss();
+                }
+                String path = folderName + fileName;
                 Bitmap bmp;
-                bmp = BitmapFactory.decodeFile(path).copy(Bitmap.Config.ARGB_8888, true);               
+                bmp = BitmapFactory.decodeFile(path).copy(Bitmap.Config.ARGB_8888, true);
                 view.changeBitmap(bmp);
-           }
+            }
 
         }
 
