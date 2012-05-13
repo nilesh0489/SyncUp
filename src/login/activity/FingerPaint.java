@@ -1,11 +1,15 @@
 package login.activity;
 
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.*;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.IBinder;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -22,10 +26,16 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import login.activity.MyService.LocalBinder;
 
 public class FingerPaint extends GraphicsActivity
         implements ColorPickerDialog.OnColorChangedListener {
-
+	
+	MyService mService;
+    boolean mBound = false;
     private ProgressDialog pd;
     private String loginId;
     private String sessionKey;
@@ -35,10 +45,15 @@ public class FingerPaint extends GraphicsActivity
     private int[] slidesBitMap;
     private MyView view;
     private String folderName;
-
+    private Timer syncTimer;
+    private Button button;
+    private Button button1;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+    	
+    	Intent intent=new Intent("login.activity.MyService");  
+        this.startService(intent);
         
         url = getIntent().getStringExtra("URL");
         loginId = getIntent().getStringExtra("login-id");
@@ -48,6 +63,8 @@ public class FingerPaint extends GraphicsActivity
         
         currentSlide = 0;
         slidesBitMap = new int[totalSlides];
+        
+      
         
         for (int j = 0; j < totalSlides; j++) {
         	slidesBitMap[j] = -1;
@@ -65,8 +82,8 @@ public class FingerPaint extends GraphicsActivity
         view = new MyView(this, getWindowManager().getDefaultDisplay().getWidth(), getWindowManager().getDefaultDisplay().getHeight());
         view.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, (float)0.9));
 
-        Button button = new Button(this);
-        Button button1 = new Button(this);
+       button = new Button(this);
+       button1 = new Button(this);
 
         button.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, (float) 0.05));
         button.setText(R.string.button2);
@@ -126,7 +143,48 @@ public class FingerPaint extends GraphicsActivity
 			}
 		});
         
+        syncTimer = new Timer();
+        syncTimer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				TimerMethod();
+			}
+
+		}, 0, 1000);
+        
     }
+    
+    protected void onStart() {
+        super.onStart();
+        // Bind to LocalService
+        Intent intent = new Intent(this, MyService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+    }
+    
+    private ServiceConnection mConnection = new ServiceConnection() 
+	{
+		public void onServiceConnected(ComponentName className, IBinder service) 
+		{
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            LocalBinder binder = (LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+	};
 
     private Paint       mPaint;
     private MaskFilter  mEmboss;
@@ -136,6 +194,36 @@ public class FingerPaint extends GraphicsActivity
         mPaint.setColor(color);
     }
 
+    public void displayToast() {
+    	Toast.makeText(getApplicationContext(), "Working", Toast.LENGTH_SHORT);
+		
+    }
+    
+    public void changeButtonText() {
+    	button.setText("Hello World");
+    }
+    
+    private void TimerMethod()
+	{
+		//This method is called directly by the timer
+		//and runs in the same thread as the timer.
+
+		//We call the method that will work with the UI
+		//through the runOnUiThread method.
+		this.runOnUiThread(Timer_Tick);
+	}
+
+	private Runnable Timer_Tick = new Runnable() {
+		public void run() {
+
+		//This method runs in the same thread as the UI.    	       
+
+		//Do something to the UI thread here
+			changeButtonText();
+			System.out.println("Here inside the timer");
+		}
+	};
+	
     public class MyView extends View {
 
         private Bitmap  mBitmap;
@@ -163,6 +251,7 @@ public class FingerPaint extends GraphicsActivity
             mBitmap = newbp;
             mCanvas.drawBitmap(newbp, 0, 0, mPaint);
             invalidate();
+            
         }
 
         @Override
@@ -315,9 +404,10 @@ public class FingerPaint extends GraphicsActivity
                 view.changeBitmap(bmp);
             }
         }
-
+        
     }
-
+    
+  
     private class DownloadImageTask extends AsyncTask<String, Void, String> {
         
         String folderName;
