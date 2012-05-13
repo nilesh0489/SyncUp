@@ -147,7 +147,7 @@ public class FingerPaint extends GraphicsActivity
 
         public MyView(Context c, int width, int height) {
             super(c);
-
+            System.out.println("In the view constructor");
             mPath = new Path();
             mBitmapPaint = new Paint(Paint.DITHER_FLAG);
             this.width = width;
@@ -157,9 +157,10 @@ public class FingerPaint extends GraphicsActivity
 
         public void changeBitmap(Bitmap bp)
         { 
-            mBitmap = bp;
+            //mBitmap = bp;
             mCanvas = new Canvas(bp);
             Bitmap newbp = Bitmap.createScaledBitmap(bp, width, height, true);
+            mBitmap = newbp;
             mCanvas.drawBitmap(newbp, 0, 0, mPaint);
             invalidate();
         }
@@ -167,7 +168,12 @@ public class FingerPaint extends GraphicsActivity
         @Override
         protected void onSizeChanged(int w, int h, int oldw, int oldh) {
             super.onSizeChanged(w, h, oldw, oldh);
-            mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            System.out.println("In on size changed function");
+            
+            if(mBitmap == null)
+            {
+            	mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            }            
             mCanvas = new Canvas(mBitmap);
         }
 
@@ -305,8 +311,7 @@ public class FingerPaint extends GraphicsActivity
             	String path = folderName + fileName;
                 System.out.println("Path is: "+path);
                 Bitmap bmp;
-                bmp = BitmapFactory.decodeFile(path).copy(Bitmap.Config.ARGB_8888, true);
-                System.out.println("Bitmap is: "+bmp);
+                bmp = BitmapFactory.decodeFile(path).copy(Bitmap.Config.ARGB_8888, true);                
                 view.changeBitmap(bmp);
             }
         }
@@ -365,17 +370,15 @@ public class FingerPaint extends GraphicsActivity
         }
 
         protected void onPostExecute(String result) {
-           
+           System.out.println("Inside Post Execute function");
             slidesBitMap[slideId] = 1;
             if (currentSlide == slideId) {
             	 if (pd.isShowing()) {
                      pd.dismiss();
                  }
-                String path = folderName + fileName;
-                System.out.println("Path is: "+path);
+                String path = folderName + fileName;                
                 Bitmap bmp;
-                bmp = BitmapFactory.decodeFile(path).copy(Bitmap.Config.ARGB_8888, true);
-                System.out.println("Bitmap is: "+bmp);
+                bmp = BitmapFactory.decodeFile(path).copy(Bitmap.Config.ARGB_8888, true);               
                 view.changeBitmap(bmp);
            }
 
