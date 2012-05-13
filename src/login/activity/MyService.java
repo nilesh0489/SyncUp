@@ -112,4 +112,40 @@ public class MyService extends Service
     	return "OK";
     }
     
+    public void syncMethod(PathPoint p, int pId, int slide) 
+    {
+    	Gson gson = new Gson();
+    	jsonString = gson.toJson(p);
+    	System.out.println("String is: " + jsonString);
+    	RestClient rc = new RestClient(Configuration.presentationUrl + pId + "/" + slide + "/sync");
+    	rc.setJSONString(jsonString);
+    	
+    	try
+    	{
+    		rc.execute(RequestMethod.POST);
+    	}
+    	catch (Exception e) {
+    		e.printStackTrace();
+		}
+    }
+    
+    public SyncResponse syncReceiveMethod(int pId, int slide)
+    {
+    	Gson gson = new Gson();
+    	RestClient rc = new RestClient(Configuration.presentationUrl + pId + "/" + slide + "/sync");
+    	
+    	try
+    	{
+    		rc.execute(RequestMethod.GET);
+    	}
+    	catch (Exception e) {
+    		e.printStackTrace();
+		}
+    	
+    	System.out.println("In service file. JSON is: " + rc.getResponse());
+    	SyncResponse response = gson.fromJson(rc.getResponse(), SyncResponse.class);
+    	
+    	return response;
+    }
+    
 }

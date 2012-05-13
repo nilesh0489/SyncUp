@@ -46,9 +46,25 @@ public class SerializablePath extends Path implements Serializable {
 
     public void loadPathPointsAsQuadTo() {
         float[] initPoints = pathPoints.remove(0);
+        float[] endPoints = pathPoints.remove(pathPoints.size() - 1);
         this.moveTo(initPoints[0], initPoints[1]);
         for (float[] pointSet : pathPoints) {
             this.quadTo(pointSet[0], pointSet[1], pointSet[2], pointSet[3]);
         }
+        this.lineTo(endPoints[0], endPoints[1]);
+    }
+    
+    public ArrayList<float[]> getPathPoints() {
+    	return pathPoints;
+    }
+    
+    public void addPathPointList(ArrayList<float[]> pathPoints) {
+    	this.pathPoints = pathPoints;
+    }
+    
+    @Override
+    public void reset() {
+    	super.reset();
+    	pathPoints = new ArrayList<float[]>();
     }
 }

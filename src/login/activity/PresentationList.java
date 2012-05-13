@@ -56,6 +56,7 @@ public class PresentationList extends ListActivity {
                 myIntent.putExtra("session-key", sessionKey);
                 myIntent.putExtra("folderName", folderName);
                 myIntent.putExtra("size", presentation.getNoSlides());
+                myIntent.putExtra("Id", presentation.getId());
                 startActivity(myIntent);
             }
         });

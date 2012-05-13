@@ -18,7 +18,10 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-import com.syncup.utils.ObjectCloner;
+
+import com.google.gson.Gson;
+import com.syncup.api.PathPoint;
+import com.syncup.api.SyncResponse;
 import com.syncup.utils.SerializablePath;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -28,6 +31,8 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -50,7 +55,7 @@ public class FingerPaint extends GraphicsActivity
     private Timer syncTimer;
     private Button button;
     private Button button1;
-    
+    private int pId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
     	
@@ -62,7 +67,7 @@ public class FingerPaint extends GraphicsActivity
         sessionKey = getIntent().getStringExtra("session-key");
         totalSlides = (int)getIntent().getLongExtra("size", 30);
         folderName = getIntent().getStringExtra("folderName");
-        
+        pId = getIntent().getIntExtra("Id", 1);
         currentSlide = 0;
         slidesBitMap = new int[totalSlides];
         
@@ -152,7 +157,7 @@ public class FingerPaint extends GraphicsActivity
 				TimerMethod();
 			}
 
-		}, 0, 1000);
+		}, 0, 5000);
         
     }
     
@@ -217,15 +222,23 @@ public class FingerPaint extends GraphicsActivity
 
 	private Runnable Timer_Tick = new Runnable() {
 		public void run() {
-
-		//This method runs in the same thread as the UI.    	       
-
-		//Do something to the UI thread here
-			changeButtonText();
-			System.out.println("Here inside the timer");
+			
+			List<PathPoint> pList;
+			SyncResponse sr = mService.syncReceiveMethod(pId, currentSlide);
+			pList = sr.getPathPointList();
+			System.out.println("PList is : " + pList);
+			if (pList != null) {
+				for (PathPoint pathPoint : pList) {
+					view.drawSyncPath(pathPoint);
+				}
+			}
 		}
 	};
 	
+    /**
+     * @author Nilesh
+     *
+     */
     public class MyView extends View {
 
         private Bitmap  mBitmap;
@@ -255,11 +268,74 @@ public class FingerPaint extends GraphicsActivity
             mCanvas = new Canvas(bp);
             Bitmap newbp = Bitmap.createScaledBitmap(bp, width, height, true);
             mBitmap = newbp;
-            mCanvas.drawBitmap(newbp, 0, 0, mPaint);
+            mCanvas.drawBitmap(newbp, 0, 0, mBitmapPaint);
             invalidate();
             
         }
 
+        class Pt{
+
+      		float x, y;
+
+      		
+
+      		Pt(float _x, float _y){
+
+      			x = _x;
+
+      			y = _y;
+
+      		}
+
+      	}
+        public void drawSyncPath(PathPoint p){
+//        	SerializablePath path = new SerializablePath();
+//        	path.addPathPointList(p.getPathPoints());
+//        	for (float[] point : p.getPathPoints()) {
+//        		path.quadTo(point[0], point[1], point[2], point[3]);
+//        		System.out.println(point[0] + " " + point[1] + " " + point[2] + " " + point[3]);
+//        	}
+//        	//path.loadPathPointsAsQuadTo();
+//        	Gson gson = new Gson();
+//        	System.out.println(gson.toJson(path.getPathPoints()));
+//        	mCanvas.drawPath(path, mPaint);
+        	
+        	Pt[] myPath = { new Pt(100, 100),
+
+  					new Pt(200, 200),
+
+  					new Pt(200, 500),
+
+  					new Pt(400, 500),
+
+  					new Pt(400, 200)
+
+  					};
+        	Paint paint = new Paint();
+
+			paint.setColor(Color.GREEN);
+
+			paint.setStrokeWidth(3);
+
+			paint.setStyle(Paint.Style.STROKE);
+
+			Path path = new Path();
+
+			
+
+			path.moveTo(myPath[0].x, myPath[0].y);
+
+			for (int i = 1; i < myPath.length; i++){
+
+				path.lineTo(myPath[i].x, myPath[i].y);
+
+			}
+			System.out.println("Here in draw Path function");
+			
+			mCanvas.drawPath(path, paint);
+        	
+        }
+        
         @Override
         protected void onSizeChanged(int w, int h, int oldw, int oldh) {
             super.onSizeChanged(w, h, oldw, oldh);
@@ -305,20 +381,9 @@ public class FingerPaint extends GraphicsActivity
             mPath.lineTo(mX, mY);
             // commit the path to our offscreen
             // TODO Copy this to a new path object and sync it
-            if (cPath == null) {
-                mCanvas.drawPath(mPath, mPaint);
-            }
-            else {
-                mCanvas.drawPath(cPath, mPaint);
-            }
-
-            try {
-                cPath = (SerializablePath)ObjectCloner.deepCopy(mPath);
-                cPath.loadPathPointsAsQuadTo();
-            } catch (Exception e) {
-                System.out.println("Error in cloning the object");
-            }
-            System.out.println(cPath);
+            PathPoint pathPoint = new PathPoint();
+            pathPoint.setPathPoints(mPath.getPathPoints());
+            mService.syncMethod(pathPoint, pId, currentSlide);
             mPath.reset();
         }
 
