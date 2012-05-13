@@ -18,6 +18,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+import com.syncup.utils.ObjectCloner;
+import com.syncup.utils.SerializablePath;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -40,7 +42,7 @@ public class FingerPaint extends GraphicsActivity
     private String loginId;
     private String sessionKey;
     private String url;
-     private int currentSlide;
+    private int currentSlide;
     private int totalSlides;
     private int[] slidesBitMap;
     private MyView view;
@@ -228,15 +230,19 @@ public class FingerPaint extends GraphicsActivity
 
         private Bitmap  mBitmap;
         private Canvas  mCanvas;
-        private Path    mPath;
+        private SerializablePath mPath;
+        private SerializablePath cPath;
         private Paint   mBitmapPaint;
         private int height;
         private int width;
 
         public MyView(Context c, int width, int height) {
             super(c);
+
+            mPath = new SerializablePath();
+            cPath = null;
             System.out.println("In the view constructor");
-            mPath = new Path();
+
             mBitmapPaint = new Paint(Paint.DITHER_FLAG);
             this.width = width;
             // TODO don't hardcode this values
@@ -289,6 +295,8 @@ public class FingerPaint extends GraphicsActivity
             float dy = Math.abs(y - mY);
             if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
                 mPath.quadTo(mX, mY, (x + mX)/2, (y + mY)/2);
+                mPath.addPathPoints(new float[]{mX, mY, (x + mX)/2, (y + mY)/2});
+
                 mX = x;
                 mY = y;
             }
@@ -296,8 +304,21 @@ public class FingerPaint extends GraphicsActivity
         private void touch_up() {
             mPath.lineTo(mX, mY);
             // commit the path to our offscreen
-            mCanvas.drawPath(mPath, mPaint);
-            // kill this so we don't double draw
+            // TODO Copy this to a new path object and sync it
+            if (cPath == null) {
+                mCanvas.drawPath(mPath, mPaint);
+            }
+            else {
+                mCanvas.drawPath(cPath, mPaint);
+            }
+
+            try {
+                cPath = (SerializablePath)ObjectCloner.deepCopy(mPath);
+                cPath.loadPathPointsAsQuadTo();
+            } catch (Exception e) {
+                System.out.println("Error in cloning the object");
+            }
+            System.out.println(cPath);
             mPath.reset();
         }
 
