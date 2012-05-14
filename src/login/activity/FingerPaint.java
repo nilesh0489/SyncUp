@@ -18,8 +18,6 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
-import com.google.gson.Gson;
 import com.syncup.api.PathPoint;
 import com.syncup.api.SyncResponse;
 import com.syncup.utils.SerializablePath;
@@ -31,7 +29,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -56,13 +53,18 @@ public class FingerPaint extends GraphicsActivity
     private Button button;
     private Button button1;
     private int pId;
+    private int mpathCounter;
+    private String presenterId;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+    	mpathCounter = 0;
         Intent intent=new Intent("login.activity.MyService");
         this.startService(intent);
 
         url = getIntent().getStringExtra("URL");
+        presenterId = getIntent().getStringExtra("Presenter-Id");
         loginId = getIntent().getStringExtra("login-id");
         sessionKey = getIntent().getStringExtra("session-key");
         totalSlides = (int)getIntent().getLongExtra("size", 30);
@@ -70,8 +72,6 @@ public class FingerPaint extends GraphicsActivity
         pId = getIntent().getIntExtra("Id", 1);
         currentSlide = 0;
         slidesBitMap = new int[totalSlides];
-
-
 
         for (int j = 0; j < totalSlides; j++) {
             slidesBitMap[j] = -1;
@@ -149,16 +149,20 @@ public class FingerPaint extends GraphicsActivity
                 }
             }
         });
+        
+        //TODO: if presenter then don't start timer
+        if(presenterId != loginId) {
 
-        syncTimer = new Timer();
-        syncTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                TimerMethod();
-            }
+        	syncTimer = new Timer();
+            syncTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    TimerMethod();
+                }
 
-        }, 0, 5000);
+            }, 0, 5000);
 
+        }
     }
 
     protected void onStart() {
@@ -205,7 +209,7 @@ public class FingerPaint extends GraphicsActivity
         Toast.makeText(getApplicationContext(), "Working", Toast.LENGTH_SHORT);
 
     }
-
+    
     public void changeButtonText() {
         button.setText("Hello World");
     }
@@ -228,23 +232,16 @@ public class FingerPaint extends GraphicsActivity
             pList = sr.getPathPointList();
             System.out.println("PList is : " + pList);
             if (pList != null) {
-                for (PathPoint pathPoint : pList) {
-                    view.drawSyncPath(pathPoint);
-                }
+                    view.drawSyncPath(pList);                       
             }
         }
     };
 
-    /**
-     * @author Nilesh
-     *
-     */
     public class MyView extends View {
 
         private Bitmap  mBitmap;
         private Canvas  mCanvas;
         private SerializablePath mPath;
-        private SerializablePath cPath;
         private Paint   mBitmapPaint;
         private int height;
         private int width;
@@ -253,12 +250,10 @@ public class FingerPaint extends GraphicsActivity
             super(c);
 
             mPath = new SerializablePath();
-            cPath = null;
             System.out.println("In the view constructor");
 
             mBitmapPaint = new Paint(Paint.DITHER_FLAG);
             this.width = width;
-            // TODO don't hardcode this values
             this.height = height -200;
         }
 
@@ -274,29 +269,23 @@ public class FingerPaint extends GraphicsActivity
         }
 
         class Pt{
-
             float x, y;
-
-
-
             Pt(float _x, float _y){
-
                 x = _x;
-
                 y = _y;
-
             }
-
         }
-        public void drawSyncPath(PathPoint p){
+        
+        public void drawSyncPath(List<PathPoint> p){
         	SerializablePath path = new SerializablePath();
-        	path.addPathPointList(p.getPathPoints());
-        	path.loadPathPointsAsQuadTo();
-        	Gson gson = new Gson();
-        	System.out.println(gson.toJson(path.getPathPoints()));
-            //mCanvas = new Canvas(mBitmap);
-            //mCanvas.setBitmap(mBitmap);
-        	mCanvas.drawPath(path, mPaint);
+        	for(int i = mpathCounter; i < p.size(); i++)
+        	{
+        		path.addPathPointList(p.get(i).getPathPoints());
+            	path.loadPathPointsAsQuadTo();
+            	mCanvas.drawPath(path, mPaint);
+        	}
+        	        	
+        	//mCanvas.drawPath(path, mPaint);
             invalidate();
 
 
@@ -338,24 +327,28 @@ public class FingerPaint extends GraphicsActivity
             if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
                 mPath.quadTo(mX, mY, (x + mX)/2, (y + mY)/2);
                 mPath.addPathPoints(new float[]{mX, mY, (x + mX)/2, (y + mY)/2});
-
                 mX = x;
                 mY = y;
             }
         }
         private void touch_up() {
             mPath.lineTo(mX, mY);
-            // commit the path to our offscreen
             // TODO Copy this to a new path object and sync it
-            PathPoint pathPoint = new PathPoint();
-            pathPoint.setPathPoints(mPath.getPathPoints());
-            mService.syncMethod(pathPoint, pId, currentSlide);
-
-
-
-            mCanvas.setBitmap(mBitmap);
-
-            mPath.reset();
+            // TODO If presenter then only do this
+            if(presenterId == loginId)
+            {
+            	PathPoint pathPoint = new PathPoint();
+                pathPoint.setPathPoints(mPath.getPathPoints());
+                mService.syncClientMethod(pathPoint, pId, currentSlide);
+                mCanvas.setBitmap(mBitmap);
+                mPath.reset();
+            }
+            else
+            {
+            	mCanvas.drawPath(mPath, mPaint);
+            	mPath.reset();
+            }
+            
         }
 
         @Override

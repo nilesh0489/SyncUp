@@ -112,7 +112,7 @@ public class MyService extends Service
     	return "OK";
     }
     
-    public void syncMethod(PathPoint p, int pId, int slide) 
+    public void syncClientMethod(PathPoint p, int pId, int slide) 
     {
     	Gson gson = new Gson();
     	jsonString = gson.toJson(p);

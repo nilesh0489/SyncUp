@@ -52,6 +52,7 @@ public class PresentationList extends ListActivity {
                 file.mkdirs();
                 Intent myIntent = new Intent(view.getContext(), FingerPaint.class);
                 myIntent.putExtra("URL", url);
+                myIntent.putExtra("Presenter-Id", presentation.getLoginId());
                 myIntent.putExtra("login-id", loginId);
                 myIntent.putExtra("session-key", sessionKey);
                 myIntent.putExtra("folderName", folderName);
