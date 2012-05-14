@@ -293,11 +293,13 @@ public class FingerPaint extends GraphicsActivity
         	{
         		path.addPathPointList(p.get(i).getPathPoints());
             	path.loadPathPointsAsQuadTo();
+                mCanvas.setBitmap(mBitmap);
             	mCanvas.drawPath(path, mPaint);
+                invalidate();
         	}
         	        	
         	//mCanvas.drawPath(path, mPaint);
-            invalidate();
+
 
 
         }
