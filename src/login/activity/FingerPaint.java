@@ -126,7 +126,7 @@ public class FingerPaint extends GraphicsActivity
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
-        mPaint.setStrokeWidth(12);
+        mPaint.setStrokeWidth(6);
 
         mEmboss = new EmbossMaskFilter(new float[] { 1, 1, 1 },
                 0.4f, 6, 3.5f);
@@ -279,14 +279,7 @@ public class FingerPaint extends GraphicsActivity
 
         }
 
-        class Pt{
-            float x, y;
-            Pt(float _x, float _y){
-                x = _x;
-                y = _y;
-            }
-        }
-        
+
         public void drawSyncPath(List<PathPoint> p){
         	SerializablePath path = new SerializablePath();
         	for(int i = mpathCounter; i < p.size(); i++)
