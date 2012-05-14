@@ -55,6 +55,7 @@ public class FingerPaint extends GraphicsActivity
     private int pId;
     private int mpathCounter;
     private String presenterId;
+    boolean isPresenter = false;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +77,17 @@ public class FingerPaint extends GraphicsActivity
         for (int j = 0; j < totalSlides; j++) {
             slidesBitMap[j] = -1;
         }
-
+        
+        if(presenterId.equals(loginId))
+        {
+        	isPresenter = true;
+        }
+        
+        else
+        {
+        	isPresenter = false;
+        }
+        
         pd = ProgressDialog.show(this, "", "Loading ...", true);
 
         super.onCreate(savedInstanceState);
@@ -151,7 +162,7 @@ public class FingerPaint extends GraphicsActivity
         });
         
         //TODO: if presenter then don't start timer
-        if(presenterId != loginId) {
+        if(!isPresenter) {
 
         	syncTimer = new Timer();
             syncTimer.schedule(new TimerTask() {
@@ -335,20 +346,17 @@ public class FingerPaint extends GraphicsActivity
             mPath.lineTo(mX, mY);
             // TODO Copy this to a new path object and sync it
             // TODO If presenter then only do this
-            if(presenterId == loginId)
+           // mCanvas = new Canvas(mBitmap);
+            mCanvas.setBitmap(mBitmap);
+            mCanvas.drawPath(mPath, mPaint);
+        	invalidate();
+            if(isPresenter)
             {
             	PathPoint pathPoint = new PathPoint();
                 pathPoint.setPathPoints(mPath.getPathPoints());
-                mService.syncClientMethod(pathPoint, pId, currentSlide);
-                mCanvas.setBitmap(mBitmap);
-                mPath.reset();
-            }
-            else
-            {
-            	mCanvas.drawPath(mPath, mPaint);
-            	mPath.reset();
-            }
-            
+                mService.syncClientMethod(pathPoint, pId, currentSlide);             
+            }            
+            mPath.reset(); 
         }
 
         @Override
